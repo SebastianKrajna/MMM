@@ -57,6 +57,10 @@ class Impuls:
             v[0] = self.calkowanie(v[1])
             v = self.wzmocnienie(0, v)
             v[3] = self.odejmowanie(v[2], v[1], v[0])
+        i = len(v) - 1
+        while i >= 0 :
+            if i != 3 : v[i] = self.calkowanie(v[i + 1])
+            i -= 1
         v = self.wzmocnienie(1, v)
         self.output_signal = self.dodawanie(self.output_signal, v[3], v[2], v[1], v[0])
 
