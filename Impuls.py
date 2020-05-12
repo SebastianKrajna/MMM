@@ -12,7 +12,8 @@ class Impuls:
         self.settings = self.convert_dict(settings)
         self.radSelected = radSelected
 
-        self.signal_displayed = []
+        self.input_singal = []
+        self.output_signal = []
         self.time = [0]
         self.max_ab = max(self.a + self.b)
 
@@ -30,19 +31,33 @@ class Impuls:
             sum += 0.001
             self.time.append(sum)
 
+        # wyznaczanie sygnału wejściowego 
         if self.radSelected == 1: # prostokatny
-            self.signal_displayed = [self.settings["amplitude"] * signal.square(2 * math.pi * (1 / self.settings["period"]) * i, 
+            self.input_singal = [self.settings["amplitude"] * signal.square(2 * math.pi * (1 / self.settings["period"]) * i, 
                                      self.settings["fulfillment"] / 100.) for i in self.time]
 
         elif self.radSelected == 2: # skok
-            self.signal_displayed = [self.settings["amplitude"] if i >= self.settings["start"] else 0 for i in self.time]
+            self.input_singal = [self.settings["amplitude"] if i >= self.settings["start"] else 0 for i in self.time]
 
         elif self.radSelected == 3: # sinusoida
-            self.signal_displayed = [self.settings["amplitude"] * math.sin(2 * math.pi * (1 / self.settings["period"]) * i) for i in self.time]
+            self.input_singal = [self.settings["amplitude"] * math.sin(2 * math.pi * (1 / self.settings["period"]) * i) for i in self.time]
 
         elif self.radSelected == 4: # trojkatny
-            self.signal_displayed = [2 * self.settings["amplitude"] * signal.square(2 * math.pi * (1 / self.settings["period"]) * i, 0.5) for i in self.time]
-            self.signal_displayed = self.calkowanie(self.signal_displayed)
+            self.input_singal = [2 * self.settings["amplitude"] * signal.square(2 * math.pi * (1 / self.settings["period"]) * i, 0.5) for i in self.time]
+            self.input_singal = self.calkowanie(self.input_singal)
+
+        # wyznaczanie sygnału wyjściowego
+        self.output_signal = [0 for _ in range(len(self.input_singal))]
+        v = [0, 0, 0, 0]
+        v[3] = self.input_singal
+        for _ in range(math.ceil(self.max_ab / 3.5) *100):
+            v[2] = self.calkowanie(v[3])
+            v[1] = self.calkowanie(v[2])
+            v[0] = self.calkowanie(v[1])
+            v = self.wzmocnienie(0, v)
+            v[3] = self.odejmowanie(v[2], v[1], v[0]) 
+
+                  
 
     def calkowanie(self, data):
         sum = 0
@@ -52,13 +67,11 @@ class Impuls:
             integral.append(sum)
         return integral
     
-
     def odejmowanie(self, v2, v1, v0):
         wynik = [0]
-        for i in range(len(self.signal_displayed)-1) :
-            wynik.append(self.signal_displayed[i] - v2[i] - v1[i] - v0[i])
+        for i in range(len(self.input_singal)-1) :
+            wynik.append(self.input_singal[i] - v2[i] - v1[i] - v0[i])
         return wynik
-
 
     def dodawanie(self, wyjscie, v3, v2, v1, v0):
         wynik = []
@@ -66,13 +79,11 @@ class Impuls:
             wynik.append(wyjscie[i] + v3[i] + v2[i] + v1[i] + v0[i])
         return wynik
 
-
     def mnozenie(self, p, v):
         wynik = []
         for i in range(len(v)) :
             wynik.append(p * v[i])
         return wynik
-
 
     def wzmocnienie(self, wejscie_czy_wyjscie, v):
         if wejscie_czy_wyjscie == 0 :
