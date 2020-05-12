@@ -111,9 +111,9 @@ class Model:
 
     def calkowanie(model, dane):
         suma = 0
-        calka = [0,0]
-        for i in range(1,len(dane)-1):
-            suma += (dane[i] + dane[i+1]) * (model.czas[i+1] - model.czas[i])/ 2.
+        calka = [dane[0]]
+        for i in range(1,len(dane)):
+            suma += (dane[i] + dane[i-1]) * (model.czas[i] - model.czas[i-1])/ 2.
             calka.append(suma)
         return calka
 
@@ -153,7 +153,7 @@ class Model:
         i = len(v) - 1
         if input("Czy pokazać sygnały na poszczególnych gałęziach?[TAK/NIE]: ").upper( ) == "TAK":
             while i >= 0 :
-                if i != 3 : v[i] = model.calkowanie(v[i + 1])
+                if i != 3: v[i] = model.calkowanie(v[i + 1])
                 plt.ylabel("v" + str(i))
                 plt.xlabel("t[s]")
                 plt.grid(True, which='both')
@@ -208,10 +208,10 @@ class Model:
 
 
     def sprawdz_stabilnosc(model) :
-        if any(model.a) < 0: print("""
+        if any(model.a) < 0 or model.a[2] <= 0 or model.a[2]*model.a[1] - model.a[0] <= 0: print("""
         
         Układ jest niestabilny.""")
-        elif model.a[2] > 0 and model.a[2]*model.a[1] - model.a[0] > 0: print("""
+        else: print("""
         
         Układ jest stabilny.""")
 
