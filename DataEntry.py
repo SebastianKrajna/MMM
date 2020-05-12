@@ -8,6 +8,7 @@ class DataEntry:
     def __init__(self, dataFrame):
         self.dataFrame = dataFrame
 
+
         # tworzenie ramki dla wspolczynnikow transmitancji
         self.dataFrame_wsp = ttk.LabelFrame(dataFrame)
         self.dataFrame_wsp.pack(side="top", fill="x", ipady = 2)
@@ -15,16 +16,19 @@ class DataEntry:
         self.num_b = [tk.StringVar(value='0') for i in range(4)]
         self.show_dataFrame_wsp()
             
+
         # tworzenie ramki dla wyswietlania transmitancji
         self.transferFrame = ttk.LabelFrame(dataFrame)
         self.transferFrame.pack(side="top", fill="x")
         self.show_transferFrame()
+
 
         # tworzenie ramki do wyswietlania wyboru pobudzenia
         self.impulsFrame = ttk.LabelFrame(dataFrame)
         self.impulsFrame.pack(side="top", fill="x")
         self.radValues = tk.IntVar()
         self.show_impulsFrame()     
+
 
         # tworzenie ramki do wczytania amplitudy, okresu i czasu trwania
         self.amplitudeFrame = ttk.LabelFrame(dataFrame)
@@ -39,23 +43,8 @@ class DataEntry:
         self.show_amplitudeFrame()
 
 
-        # tworzenie ramki do wyświetlania czy układ jest stabilny
-        self.stabilityFrame = ttk.LabelFrame(dataFrame)
-        self.stabilityFrame.pack(side="top", fill="x")
-        self.stability_label = tk.Label(self.stabilityFrame, text = "Czy jest stabilny?", font = 20)
-        self.stability_label.pack(fill="both", ipady = 5)
-              
-        # przycisk do wykreslenia wykresow
-        self.draw_button = tk.Button(self.dataFrame, text = "Rysuj", command = self.draw_function)
-        self.draw_button.pack(side="top", fill="x", ipady = 5)
-
-    def draw_function(self):
-        self.impulse = Impuls(self.impulsFrame, self.num_a, self.num_b, self.impuls_settings)
-        self.impulse.wyswietl_wspolczynniki()
-        if self.impulse.is_stable():
-            self.stability_label.config(text = "STABILNY", compound = "center", foreground = "green")
-        else:
-            self.stability_label.config(text = "NIESTABILNY", compound = "center", foreground = "red")
+    def get_impuls(self):
+        return Impuls(self.impulsFrame, self.num_a, self.num_b, self.impuls_settings, self.radValues.get())
 
     # wyswietlanie okienek do wpisania wspolczynnikow
     def show_dataFrame_wsp(self):
@@ -84,26 +73,26 @@ class DataEntry:
     # wyswietlania transmitancji
     def show_transferFrame(self):
         self.transfer_text = [tk.StringVar() for i in range(3)]
-        self.transfer_text[0] = str(self.num_b[3].get()) + "*s^3 + " + str(self.num_b[2].get()) + "*s^2 + " + str(self.num_b[1].get()) + "*s + " + str(self.num_b[0].get())
+        self.transfer_text[0] = str(self.num_b[3].get()) + "*s^3 + " + str(self.num_b[2].get()) + "*s\u00b2 + " + str(self.num_b[1].get()) + "*s + " + str(self.num_b[0].get())
         self.transfer_text[1] = "——————————————" 
         self.transfer_text[2] = " s^3 + " + str(self.num_a[2].get()) + "*s^2 + " + str(self.num_a[1].get())
         self.transfer_text[2] += "*s + " + str(self.num_a[0].get())
 
-        self.label_y = tk.Label(self.transferFrame, text = " Y(s) ")
+        self.label_y = tk.Label(self.transferFrame, text = " Y(s) ", font = 15)
         self.label_y.grid(column = 0, row = 0)
-        self.label_y = tk.Label(self.transferFrame, text = " ——— ")
+        self.label_y = tk.Label(self.transferFrame, text = " ——— ", font = 15)
         self.label_y.grid(column = 0, row = 1)
-        self.label_y = tk.Label(self.transferFrame, text = " X(s) ")
+        self.label_y = tk.Label(self.transferFrame, text = " X(s) ", font = 15)
         self.label_y.grid(column = 0, row = 2)
 
-        self.label_equals = tk.Label(self.transferFrame, text = " = ")
+        self.label_equals = tk.Label(self.transferFrame, text = " = ", font = 15)
         self.label_equals.grid(column = 1, row = 1)
 
-        self.label0 = tk.Label(self.transferFrame, text = self.transfer_text[0])
+        self.label0 = tk.Label(self.transferFrame, text = self.transfer_text[0], font = 15)
         self.label0.grid(column = 2, row = 0)
-        self.label1 = tk.Label(self.transferFrame, text = self.transfer_text[1])
+        self.label1 = tk.Label(self.transferFrame, text = self.transfer_text[1], font = 15)
         self.label1.grid(column = 2, row = 1)
-        self.label2 = tk.Label(self.transferFrame, text = self.transfer_text[2])
+        self.label2 = tk.Label(self.transferFrame, text = self.transfer_text[2], font = 15)
         self.label2.grid(column = 2, row = 2)
         self.transfer_text_actualization()
 
@@ -115,6 +104,7 @@ class DataEntry:
                                         textvariable = self.impuls_settings['amplitude'],
                                         state = 'disabled')
         self.amplitude_entry.grid(column = 1, row = 0)
+        self.clear_entry_function(self.amplitude_entry)
 
         self.period_label = tk.Label(self.amplitudeFrame, text="Okres[s]: ")
         self.period_label.grid(column = 0, row = 1, sticky = "e")
@@ -122,6 +112,7 @@ class DataEntry:
                                         textvariable = self.impuls_settings['period'],
                                         state = 'disabled')
         self.period_entry.grid(column = 1, row = 1)
+        self.clear_entry_function(self.period_entry)
 
         self.duration_label = tk.Label(self.amplitudeFrame, text="Czas trwania[s]: ")
         self.duration_label.grid(column = 0, row = 2, sticky = "e")
@@ -129,6 +120,7 @@ class DataEntry:
                                         textvariable = self.impuls_settings['duration'],
                                         state = 'disabled')
         self.duration_entry.grid(column = 1, row = 2)
+        self.clear_entry_function(self.duration_entry)
 
         self.fulfillment_label = tk.Label(self.amplitudeFrame, text="Wypełnienie: ")
         self.fulfillment_label.grid(column = 0, row = 3, sticky = "e")
@@ -136,6 +128,7 @@ class DataEntry:
                                         textvariable = self.impuls_settings['fulfillment'],
                                         state = 'disabled')
         self.fulfillment_entry.grid(column = 1, row = 3)
+        self.clear_entry_function(self.fulfillment_entry)
 
         self.start_label = tk.Label(self.amplitudeFrame, text="Początek skoku: ")
         self.start_label.grid(column = 0, row = 4, sticky = "e")
@@ -143,6 +136,7 @@ class DataEntry:
                                         textvariable = self.impuls_settings['start'],
                                         state = 'disabled')
         self.start_entry.grid(column = 1, row = 4)
+        self.clear_entry_function(self.start_entry)
    
     # wyswietlanie wyboru pobudzenia
     def show_impulsFrame(self):
@@ -162,32 +156,28 @@ class DataEntry:
     def rad_event(self):
         radSelected = self.radValues.get()
 
-        if radSelected == 1:
-            
-            self.impulse = Impuls(self.impulsFrame, self.num_a, self.num_b, self.impuls_settings)
-            self.impulse.wyswietl_wspolczynniki()
-
+        if radSelected == 1: # prostokatny
             self.amplitude_entry['state'] =     'normal'
             self.period_entry['state'] =        'normal'
             self.duration_entry['state'] =      'normal'
             self.fulfillment_entry['state'] =   'normal'
             self.start_entry['state'] =         'disabled'
 
-        elif radSelected == 2:
+        elif radSelected == 2: # skok
             self.amplitude_entry['state'] =     'normal'
             self.period_entry['state'] =        'disabled'
             self.duration_entry['state'] =      'normal'
             self.fulfillment_entry['state'] =   'disabled'
             self.start_entry['state'] =         'normal'
 
-        elif radSelected == 3:
+        elif radSelected == 3: # sinusoida
             self.amplitude_entry['state'] =     'normal'
             self.period_entry['state'] =        'normal'
             self.duration_entry['state'] =      'normal'
             self.fulfillment_entry['state'] =   'disabled'
             self.start_entry['state'] =         'disabled'
 
-        elif radSelected == 4:
+        elif radSelected == 4: # trojkatny
             self.amplitude_entry['state'] =     'normal'
             self.period_entry['state'] =        'normal'
             self.duration_entry['state'] =      'normal'
@@ -202,6 +192,6 @@ class DataEntry:
 
     # aktualizacja wyswietlania wspolczynnikow transmitancji
     def transfer_text_actualization(self):
-        self.label0.configure(text = str(self.num_b[3].get()) + "*s^3 + " + str(self.num_b[2].get()) + "*s^2 + " + str(self.num_b[1].get()) + "*s + " + str(self.num_b[0].get()))
-        self.label2.configure(text = "s^3 + " + str(self.num_a[2].get()) + "*s^2 + " + str(self.num_a[1].get()) + "*s + " + str(self.num_a[0].get()))
+        self.label0.configure(text = str(self.num_b[3].get()) + "s\u00b3 + " + str(self.num_b[2].get()) + "s\u00b2 + " + str(self.num_b[1].get()) + "s + " + str(self.num_b[0].get()))
+        self.label2.configure(text = "s\u00b3 + " + str(self.num_a[2].get()) + "s\u00b2 + " + str(self.num_a[1].get()) + "s + " + str(self.num_a[0].get()))
         self.label0.after(10, self.transfer_text_actualization)
