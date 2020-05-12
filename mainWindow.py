@@ -29,6 +29,9 @@ class Window():
         self.drawFrame.place(x = 310, y = 5, width = 800, height = 800)
 
     def draw_function(self):
+        for widget in self.drawFrame.winfo_children():
+            widget.destroy()
+
         self.impulse = self.dataEntry.get_impuls()
         self.impulse.wyswietl_wspolczynniki()
 
