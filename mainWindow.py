@@ -8,11 +8,12 @@ class Window():
     def __init__(self, master):
         self.master = master
         master.title("")
-        master.minsize(1000, 800)
+        master.minsize(1150, 850)
         
         self.dataFrame = ttk.LabelFrame(master, text = "Wprowadź dane")
         self.dataFrame.place(x = 5, y = 5, width = 300, height = 800)
         self.dataEntry = DataEntry(self.dataFrame)
+        
 
         # tworzenie ramki do wyświetlania czy układ jest stabilny
         self.stabilityFrame = ttk.LabelFrame(self.dataFrame)

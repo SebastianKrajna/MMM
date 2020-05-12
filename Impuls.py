@@ -19,7 +19,8 @@ class Impuls:
 
         self.calculations()
 
-
+        self.s1 = signal.lti(self.b, [1] + self.a)
+        self.w, self.wzm, self.faza = signal.bode(self.s1)
 
 
     
@@ -27,8 +28,8 @@ class Impuls:
     def calculations(self):
         # wyznaczanie czasu
         sum = 0
-        for _ in range(int(self.settings['duration'])*1000-1):
-            sum += 0.001
+        for _ in range(int(self.settings['duration'])*100-1):
+            sum += 0.010
             self.time.append(sum)
 
         # wyznaczanie sygnału wejściowego 
@@ -55,7 +56,9 @@ class Impuls:
             v[1] = self.calkowanie(v[2])
             v[0] = self.calkowanie(v[1])
             v = self.wzmocnienie(0, v)
-            v[3] = self.odejmowanie(v[2], v[1], v[0]) 
+            v[3] = self.odejmowanie(v[2], v[1], v[0])
+        v = self.wzmocnienie(1, v)
+        self.output_signal = self.dodawanie(self.output_signal, v[3], v[2], v[1], v[0])
 
                   
 

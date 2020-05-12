@@ -74,13 +74,13 @@ class DataEntry:
     def show_transferFrame(self):
         self.transfer_text = [tk.StringVar() for i in range(3)]
         self.transfer_text[0] = str(self.num_b[3].get()) + "*s^3 + " + str(self.num_b[2].get()) + "*s\u00b2 + " + str(self.num_b[1].get()) + "*s + " + str(self.num_b[0].get())
-        self.transfer_text[1] = "——————————————" 
+        self.transfer_text[1] = "————————————" 
         self.transfer_text[2] = " s^3 + " + str(self.num_a[2].get()) + "*s^2 + " + str(self.num_a[1].get())
         self.transfer_text[2] += "*s + " + str(self.num_a[0].get())
 
         self.label_y = tk.Label(self.transferFrame, text = " Y(s) ", font = 15)
         self.label_y.grid(column = 0, row = 0)
-        self.label_y = tk.Label(self.transferFrame, text = " ——— ", font = 15)
+        self.label_y = tk.Label(self.transferFrame, text = " ———", font = 15)
         self.label_y.grid(column = 0, row = 1)
         self.label_y = tk.Label(self.transferFrame, text = " X(s) ", font = 15)
         self.label_y.grid(column = 0, row = 2)
