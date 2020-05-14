@@ -2,20 +2,47 @@ import tkinter as tk
 from tkinter import ttk
 
 from DataEntry import *
-
+from Graphs import *
 
 class Window():
     def __init__(self, master):
         self.master = master
         master.title("")
-        master.minsize(1000, 500)
+        master.minsize(1415, 810)
         
-        self.dataFrame = ttk.LabelFrame(master, text = "Wprowadź dane")
-        self.dataFrame.place(x = 5, y = 5, width = 300, height = 500)
+        self.dataFrame = tk.LabelFrame(master, text = "Wprowadź dane", relief="groove")
+        self.dataFrame.place(x = 5, y = 5, width = 300, height = 800)
         self.dataEntry = DataEntry(self.dataFrame)
+        
 
-        self.drawFrame = ttk.LabelFrame(master, text = "Wykresy")
-        self.drawFrame.place(x = 310, y = 5, width = 800, height = 500)
+        # tworzenie ramki do wyświetlania czy układ jest stabilny
+        self.stabilityFrame = tk.LabelFrame(self.dataFrame, relief="groove")
+        self.stabilityFrame.pack(side="top", fill="x", padx = 2)
+        self.stability_label = tk.Label(self.stabilityFrame, text = "Czy jest stabilny?", font = 20)
+        self.stability_label.pack(fill="both", ipady = 5, pady = 2, padx = 2)
+              
+        # przycisk do wykreslenia wykresow
+        self.draw_button = tk.Button(self.dataFrame, text = "Rysuj", font = 17, relief="groove", command = self.draw_function)
+        self.draw_button.pack(side="bottom", fill="x", ipady = 5, pady = 2, padx = 2)
+
+        self.drawFrame = tk.LabelFrame(master, text = "Wykresy", relief="groove")
+        self.drawFrame.place(x = 310, y = 5, width = 1100, height = 800)
+
+    def draw_function(self):
+        for widget in self.drawFrame.winfo_children():
+            widget.destroy()
+
+        self.impulse = self.dataEntry.get_impuls()
+        self.impulse.wyswietl_wspolczynniki()
+
+        if self.impulse.is_stable():
+            self.stability_label.config(text = "STABILNY", compound = "center", foreground = "green")
+        else:
+            self.stability_label.config(text = "NIESTABILNY", compound = "center", foreground = "red")
+
+        self.Graphs = Graphs(self.drawFrame, self.impulse)
+
+        
 
 
 if __name__ == "__main__":
