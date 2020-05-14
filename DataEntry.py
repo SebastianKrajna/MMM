@@ -10,29 +10,29 @@ class DataEntry:
 
 
         # tworzenie ramki dla wspolczynnikow transmitancji
-        self.dataFrame_wsp = ttk.LabelFrame(dataFrame)
-        self.dataFrame_wsp.pack(side="top", fill="x", ipady = 2)
+        self.dataFrame_wsp = tk.LabelFrame(dataFrame, relief="groove")
+        self.dataFrame_wsp.pack(side="top", fill="x", ipady = 2, pady = 2, padx = 2)
         self.num_a = [tk.StringVar(value='0') for i in range(3)]
         self.num_b = [tk.StringVar(value='0') for i in range(4)]
         self.show_dataFrame_wsp()
             
 
         # tworzenie ramki dla wyswietlania transmitancji
-        self.transferFrame = ttk.LabelFrame(dataFrame)
-        self.transferFrame.pack(side="top", fill="x")
+        self.transferFrame = tk.LabelFrame(dataFrame, relief="groove")
+        self.transferFrame.pack(side="top", fill="x", pady = 2, padx = 2)
         self.show_transferFrame()
 
 
         # tworzenie ramki do wyswietlania wyboru pobudzenia
-        self.impulsFrame = ttk.LabelFrame(dataFrame)
-        self.impulsFrame.pack(side="top", fill="x")
+        self.impulsFrame = tk.LabelFrame(dataFrame, relief="groove")
+        self.impulsFrame.pack(side="top", fill="x", pady = 2, padx = 2)
         self.radValues = tk.IntVar()
         self.show_impulsFrame()     
 
 
         # tworzenie ramki do wczytania amplitudy, okresu i czasu trwania
-        self.amplitudeFrame = ttk.LabelFrame(dataFrame)
-        self.amplitudeFrame.pack(side="top", fill="x")
+        self.amplitudeFrame = tk.LabelFrame(dataFrame, relief="groove")
+        self.amplitudeFrame.pack(side="top", fill="x", pady = 2, padx = 2)
 
         self.impuls_settings = {'amplitude':   tk.StringVar(value='0'),
                                 'period':      tk.StringVar(value='0'),
@@ -42,9 +42,19 @@ class DataEntry:
 
         self.show_amplitudeFrame()
 
+        # tworzenie ramki do wczytania rozdzielczosci calkowania
+        self.resolution = tk.StringVar(value="0.01")
+        self.resolutionFrame = tk.LabelFrame(dataFrame, relief="groove")
+        self.resolutionFrame.pack(side="top", fill="x", pady = 2, padx = 2)
+
+        self.resolution_label = tk.Label(self.resolutionFrame, text="Rozdzielczość: ")
+        self.resolution_label.grid(column = 0, row = 0, sticky = "e")
+        self.resolution_entry = tk.Entry(self.resolutionFrame, textvariable = self.resolution)
+        self.resolution_entry.grid(column = 1, row = 0, sticky = "e")
+
 
     def get_impuls(self):
-        return Impuls(self.impulsFrame, self.num_a, self.num_b, self.impuls_settings, self.radValues.get())
+        return Impuls(self.impulsFrame, self.num_a, self.num_b, self.impuls_settings, self.radValues.get(), self.resolution)
 
     # wyswietlanie okienek do wpisania wspolczynnikow
     def show_dataFrame_wsp(self):
@@ -122,7 +132,7 @@ class DataEntry:
         self.duration_entry.grid(column = 1, row = 2)
         self.clear_entry_function(self.duration_entry)
 
-        self.fulfillment_label = tk.Label(self.amplitudeFrame, text="Wypełnienie: ")
+        self.fulfillment_label = tk.Label(self.amplitudeFrame, text="Wypełnienie[%]: ")
         self.fulfillment_label.grid(column = 0, row = 3, sticky = "e")
         self.fulfillment_entry = tk.Entry(self.amplitudeFrame,
                                         textvariable = self.impuls_settings['fulfillment'],

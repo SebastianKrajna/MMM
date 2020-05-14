@@ -5,7 +5,6 @@ from matplotlib import pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
-
 class Graphs:
     def __init__(self, drawFrame, impulse):
         self.drawFrame = drawFrame
@@ -15,11 +14,11 @@ class Graphs:
 
         self.tab1 = ttk.Frame(self.tab_control)
         self.tab_control.add(self.tab1, text = "Sygnał wejściowy")
-        self.add_signal(self.impulse.time, self.impulse.input_singal, self.tab1)
+        self.add_signal(self.impulse.time, self.impulse.input_singal, self.tab1, "u(t)")
 
         self.tab2 = ttk.Frame(self.tab_control)
         self.tab_control.add(self.tab2, text = "Sygnał wyjściowy")
-        self.add_signal(self.impulse.time, self.impulse.output_signal, self.tab2)
+        self.add_signal(self.impulse.time, self.impulse.output_signal, self.tab2, "y(t)")
 
         self.tab3 = ttk.Frame(self.tab_control)
         self.tab_control.add(self.tab3, text = "Wykres amplitudowy")
@@ -33,14 +32,15 @@ class Graphs:
         self.tab_control.pack(expan = 1, fill = "both")
 
 
-    def add_signal(self, s_x, s_y, frame):
+    def add_signal(self, s_x, s_y, frame, y):
         f = Figure(figsize=(4,4), dpi=100)
 
         a = f.add_subplot(1,1,1)
         a.plot(s_x, s_y)
 
-        a.set_ylabel("y")
-        a.set_xlabel("x")
+        a.set_ylabel(y)
+        a.set_xlabel("time [s]")
+        a.grid(True, linestyle='-.')
 
         canvas = FigureCanvasTkAgg(f, frame)
         canvas.get_tk_widget().pack(fill = "both", side = "bottom", expand = True)
@@ -54,6 +54,7 @@ class Graphs:
 
         aa.set_xlabel("Czestotliwosc")
         aa.set_ylabel("Wzmocnienie")
+        aa.grid(True, linestyle='-.')
 
         canvas = FigureCanvasTkAgg(fa, self.tab3)
         canvas.get_tk_widget().pack(fill = "both", side = "bottom", expand = True)
@@ -67,6 +68,7 @@ class Graphs:
 
         ap.set_xlabel("Czestotliwosc")
         ap.set_ylabel("Faza")
+        ap.grid(True, linestyle='-.')
 
         canvas = FigureCanvasTkAgg(fp, self.tab4)
         canvas.get_tk_widget().pack(fill = "both", side = "bottom", expand = True)

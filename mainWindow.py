@@ -8,25 +8,25 @@ class Window():
     def __init__(self, master):
         self.master = master
         master.title("")
-        master.minsize(1150, 850)
+        master.minsize(1415, 810)
         
-        self.dataFrame = ttk.LabelFrame(master, text = "Wprowadź dane")
+        self.dataFrame = tk.LabelFrame(master, text = "Wprowadź dane", relief="groove")
         self.dataFrame.place(x = 5, y = 5, width = 300, height = 800)
         self.dataEntry = DataEntry(self.dataFrame)
         
 
         # tworzenie ramki do wyświetlania czy układ jest stabilny
-        self.stabilityFrame = ttk.LabelFrame(self.dataFrame)
+        self.stabilityFrame = tk.LabelFrame(self.dataFrame, relief="groove")
         self.stabilityFrame.pack(side="top", fill="x")
         self.stability_label = tk.Label(self.stabilityFrame, text = "Czy jest stabilny?", font = 20)
-        self.stability_label.pack(fill="both", ipady = 5)
+        self.stability_label.pack(fill="both", ipady = 5, pady = 2, padx = 2)
               
         # przycisk do wykreslenia wykresow
-        self.draw_button = tk.Button(self.dataFrame, text = "Rysuj", font = 17, command = self.draw_function)
-        self.draw_button.pack(side="top", fill="x", ipady = 5)
+        self.draw_button = tk.Button(self.dataFrame, text = "Rysuj", font = 17, relief="groove", command = self.draw_function)
+        self.draw_button.pack(side="bottom", fill="x", ipady = 5, pady = 2, padx = 2)
 
-        self.drawFrame = ttk.LabelFrame(master, text = "Wykresy")
-        self.drawFrame.place(x = 310, y = 5, width = 800, height = 800)
+        self.drawFrame = tk.LabelFrame(master, text = "Wykresy", relief="groove")
+        self.drawFrame.place(x = 310, y = 5, width = 1100, height = 800)
 
     def draw_function(self):
         for widget in self.drawFrame.winfo_children():

@@ -4,13 +4,14 @@ from scipy import signal
 import math
 
 class Impuls:
-    def __init__(self, impulsFrame, num_a, num_b, settings, radSelected):
+    def __init__(self, impulsFrame, num_a, num_b, settings, radSelected, resolution):
         self.impulsFrame = impulsFrame
 
         self.a = self.convert(num_a)
         self.b = self.convert(num_b)
         self.settings = self.convert_dict(settings)
         self.radSelected = radSelected
+        self.resolution = float(resolution.get())
 
         self.input_singal = []
         self.output_signal = []
@@ -19,7 +20,7 @@ class Impuls:
 
         self.calculations()
 
-        self.s1 = signal.lti(self.b, [1] + self.a)
+        self.s1 = signal.lti([self.b[3], self.b[2], self.b[1], self.b[0]], [1, self.a[2], self.a[1], self.a[0]])
         self.w, self.wzm, self.faza = signal.bode(self.s1)
 
 
@@ -28,8 +29,8 @@ class Impuls:
     def calculations(self):
         # wyznaczanie czasu
         sum = 0
-        for _ in range(int(self.settings['duration'])*100-1):
-            sum += 0.010
+        for _ in range(int(self.settings['duration'])*(int(1.0/self.resolution))-1):
+            sum += self.resolution
             self.time.append(sum)
 
         # wyznaczanie sygnału wejściowego 
@@ -114,7 +115,7 @@ class Impuls:
     def convert(self, num_x):
         a = []
         for x in num_x:
-            if x.get().isnumeric():
+            if self.is_number(x.get()):
                 a.append(float(x.get()))
             else:
                 a.append(0)
@@ -124,7 +125,7 @@ class Impuls:
     def convert_dict(self, set):
         d = {}
         for k,v in set.items():
-            if v.get().isnumeric():
+            if self.is_number(v.get()):
                 d[k] = float(v.get())
             else:
                 d[k] = 0
@@ -141,3 +142,10 @@ class Impuls:
         print(self.settings['duration'])
         print(self.settings['fulfillment'])
         print(self.settings['start'])
+
+    def is_number(self, s):
+        try:
+            float(s)
+            return True
+        except ValueError:
+            return False
