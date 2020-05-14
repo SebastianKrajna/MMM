@@ -9,13 +9,14 @@ class Model:
     b = []
     sygnal = []
     czas = []
+    max_ab = 0
 
 
     def podaj_wspolczynniki(model) :
         model.a = []
         model.b = []
         print("""
-                b3*s^3 + b2*s^2 + b1*s^1 + b0*
+                b3*s^3 + b2*s^2 + b1*s^1 + b0
         G(s) = -----------------------------------
                  1*s^3 + a2*s^2 + a1*s^1 + a0
 
@@ -24,6 +25,9 @@ class Model:
             model.a.append(float(input("Podaj a" + str(i) + ": ")))
         for i in range(4) :
             model.b.append(float(input("Podaj b" + str(i) + ": ")))
+
+        if max(model.a) >= max(model.b): model.max_ab = max(model.a)
+        else: model.max_ab = max(model.b)
 
 
     def wyswietl_wspolczynniki(model):
@@ -36,6 +40,7 @@ class Model:
 
     def wejscie_systemu(model) :
         model.sygnal = []
+        model.czas = [0]
         x = int(input("""
             Wybierz rodzaj sygnału wejściowego:
             [1] - Sygnał prostokątny
@@ -44,7 +49,6 @@ class Model:
             [4] - Sygnal trojkatny
             [5] - Wyjdz
             Podaj numer opcji: """))
-
         ustaw = {}
         if x == 1 :
             ustaw = {'amplituda' : 0,
@@ -63,14 +67,19 @@ class Model:
             ustaw = {'amplituda' : 0,
                      'okres[s]' : 0,
                      'czas trwania[s]' : 0}
+
         if x != 5 :
             print("\n")
-            for wymaganie in ustaw :
+            for wymaganie in ustaw:
                 ustaw[wymaganie] = float(input("Podaj " + wymaganie + ": "))
-            model.czas = np.linspace(0, ustaw["czas trwania[s]"], int(ustaw["czas trwania[s]"] * 1000.), endpoint=True)
+
+            suma = 0
+            for _ in range(int(ustaw["czas trwania[s]"])*1000-1):
+                suma += 0.001
+                model.czas.append(suma)
+
             if x == 1 :
-                model.sygnal = [ustaw["amplituda"] * signal.square(2 * np.pi * (1 / ustaw["okres[s]"]) * i,
-                                                             ustaw["wypelnienie[%]"] / 100.) for i in model.czas]
+                model.sygnal = [ustaw["amplituda"] * signal.square(2 * np.pi * (1 / ustaw["okres[s]"]) * i, ustaw["wypelnienie[%]"] / 100.) for i in model.czas]
             elif x == 2 :
                 model.sygnal = [ustaw["amplituda"] if i >= ustaw["poczatek skoku[s]"] else 0 for i in model.czas]
             elif x == 3 :
@@ -102,18 +111,16 @@ class Model:
 
     def calkowanie(model, dane):
         suma = 0
-        calka = []
-        dx = model.czas[1] - model.czas[0]
-        for i in range(len(dane) - 1):
-            suma += (dane[i] + dane[i + 1]) * dx / 2
+        calka = [dane[0]]
+        for i in range(1,len(dane)):
+            suma += (dane[i] + dane[i-1]) * (model.czas[i] - model.czas[i-1])/ 2.
             calka.append(suma)
-        calka.append(suma)
         return calka
 
 
     def odejmowanie(model, v2, v1, v0):
-        wynik = []
-        for i in range(len(model.sygnal)) :
+        wynik = [0]
+        for i in range(len(model.sygnal)-1) :
             wynik.append(model.sygnal[i] - v2[i] - v1[i] - v0[i])
         return wynik
 
@@ -135,23 +142,27 @@ class Model:
     def wzmocnienie(model, wejscie_czy_wyjscie, v):
         if wejscie_czy_wyjscie == 0 :
             for i in range(len(model.a)) :
-                if model.a[i] != 1 : v[i] = model.mnozenie(model.a[i], v[i])
+                v[i] = model.mnozenie(model.a[i], v[i])
         else :
             for i in range(len(model.b)) :
-                if model.b[i] != 1 : v[i] = model.mnozenie(model.b[i], v[i])
+                v[i] = model.mnozenie(model.b[i], v[i])
         return v
 
 
     def wyswietlanie(model, wyjscie, v) :
-        if str(input("Czy pokazać sygnały na poszczególnych gałęziach?[TAK/NIE]: ")).upper( ) == "TAK" :
-            i = len(v) - 1
+        i = len(v) - 1
+        if input("Czy pokazać sygnały na poszczególnych gałęziach?[TAK/NIE]: ").upper( ) == "TAK":
             while i >= 0 :
-                if i != 3 : v[i] = model.calkowanie(v[i + 1])
+                if i != 3: v[i] = model.calkowanie(v[i + 1])
                 plt.ylabel("v" + str(i))
                 plt.xlabel("t[s]")
                 plt.grid(True, which='both')
                 plt.plot(model.czas, v[i])
                 plt.show( )
+                i -= 1
+        else:
+            while i >= 0 :
+                if i != 3 : v[i] = model.calkowanie(v[i + 1])
                 i -= 1
 
         v = model.wzmocnienie(1, v)
@@ -169,7 +180,7 @@ class Model:
             wyjscie = [0 for _ in range(len(model.sygnal))]
             v = [0, 0, 0, 0]
             v[3] = model.sygnal
-            for _ in range(int(10 * len(model.czas) / 1000)) :
+            for _ in range(math.ceil(model.max_ab / 3.5) *100):
                 v[2] = model.calkowanie(v[3])
                 v[1] = model.calkowanie(v[2])
                 v[0] = model.calkowanie(v[1])
@@ -196,6 +207,16 @@ class Model:
             print("Nie podano jeszcze współczynników.")
 
 
+    def sprawdz_stabilnosc(model) :
+        if any(model.a) < 0 or model.a[2] <= 0 or model.a[2]*model.a[1] - model.a[0] <= 0: print("""
+        
+        Układ jest niestabilny.""")
+        else: print("""
+        
+        Układ jest stabilny.""")
+
+
+
 def menu():
     system = Model( )
     while (True) :
@@ -204,12 +225,13 @@ def menu():
         Jaką operację chcesz wykonać?
 
         [1] - Podać współczynniki a i b
-        [2] - Pokaz wspolczynniki a i b
+        [2] - Pokaz współczynniki a i b
         [3] - Ustawić sygnał wejściowy
         [4] - Pokaż aktualne wejście systemu
         [5] - Pokaż wyjście systemu
         [6] - Wykreśl charakterystyki częstotliwościowe
-        [7] - Wyjdź z programu
+        [7] - Sprawdź stabilność systemu
+        [8] - Wyjdź z programu
 
          Podaj numer opcji: """)
         if x == '1' :
@@ -224,7 +246,8 @@ def menu():
             system.symuluj( )
         elif x == '6' :
             system.bode( )
-        elif x == '7' : return 0
-
+        elif x == '7' :
+            system.sprawdz_stabilnosc()
+        elif x == '8' : return 0
 
 menu()

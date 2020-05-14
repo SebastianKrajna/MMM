@@ -11,9 +11,11 @@ class DataEntry:
 
         # tworzenie ramki dla wspolczynnikow transmitancji
         self.dataFrame_wsp = tk.LabelFrame(dataFrame, relief="groove")
+
         self.dataFrame_wsp.pack(side="top", fill="x", pady = 2, padx = 2)
         self.num_b = [tk.StringVar(value='0') for i in range(4)]
         self.num_a = [tk.StringVar(value='0') for i in range(3)]
+
         self.show_dataFrame_wsp()
             
 
@@ -58,12 +60,15 @@ class DataEntry:
 
     # wyswietlanie okienek do wpisania wspolczynnikow
     def show_dataFrame_wsp(self):
+
         SUB = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
         column = [[6,7],[4,5],[2,3],[0,1]]
+
         
         # pola do wprowadzenia wspolczynnikow b 
         self.enter_b = []
         self.label_b = []
+
         for i in reversed(range(4)):
             self.label_b.append(tk.Label(self.dataFrame_wsp, text = "b" + str(i).translate(SUB) + "= ", font = 13))
             self.label_b[3-i].grid(column = column[i][0], row = 0, pady = 1)
@@ -170,7 +175,7 @@ class DataEntry:
 
         self.label0.configure(text = text_0)
         self.label2.configure(text = text_2)
-        self.label0.after(10, self.transfer_text_actualization)
+
    
     # wyswietlanie wyboru pobudzenia
     def show_impulsFrame(self):
@@ -218,6 +223,7 @@ class DataEntry:
             self.fulfillment_entry['state'] =   'disabled'
             self.start_entry['state'] =         'disabled'
 
+
     # wyswietlanie okienek wpisywania ustawien sygnalu
     def show_amplitudeFrame(self):
         self.amplitude_label = tk.Label(self.amplitudeFrame, text="Amplituda: ")
@@ -260,10 +266,9 @@ class DataEntry:
         self.start_entry.grid(column = 1, row = 4)
         self.clear_entry_function(self.start_entry)
 
+
     # czyszczenie po kliknieciu na okienko
     def clear_entry_function(self, a):
         def clear_entry(event):
             a.delete(0, tk.END)
         a.bind('<Button-1>', clear_entry)
-
-    
