@@ -8,6 +8,7 @@ class DataEntry:
     def __init__(self, dataFrame):
         self.dataFrame = dataFrame
 
+        #asd
 
         # tworzenie ramki dla wspolczynnikow transmitancji
         self.dataFrame_wsp = tk.LabelFrame(dataFrame, relief="groove")
